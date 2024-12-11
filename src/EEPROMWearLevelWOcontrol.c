@@ -1,24 +1,67 @@
-uint16_t lengthPerVar;
-uint16_t numOfVar;
 
-void begin(uint16_t *latestAddress[], uint16_t partition_length){
-    numOfVar=(uint16_t)(sizeof(*latestAddress)/sizeof(uint16_t));
+//uint16_t lengthOfPartition;
+
+struct eepromwl{
+    uint16_t address_toRead;
+    uint16_t address_toWrite;
+} typedef struct eepromwl MSN_eepromwl;
+
+void begin(MSN_eepromwl *address[], uint16_t partition_length){
+    numOfVar=(uint16_t)(sizeof(address)/sizeof(address[0]));
     lengthPerVar=getLengthAllocationPerVar(partition_length);
     for(uint8_t var_n=0;var_n<numOfVar;var_n++){
-		for(int addr=0; addr<partition_length; addr+=2){
-			if(!EEPROM.read(addr)){}
+        uint16_t offset=lengthPerVar*var_n;
+		for(int addr=0; addr<lengthPerVar; addr+=2){
+			if(!EEPROM.read(addr+offset)){}
 			else{
-                *latestAddress[var_n]=EEPROM.read(addr);
+                address[var_n]->address_toRead=EEPROM.read(addr-1+offset);
                 addr=partition_length;
             }
+        }
+        bool isFull=true;
+        for(int addr=0; addr<lengthPerVar; addr+=2){
+			if(!EEPROM.read(addr+offset)){}
+			else{
+                address[var_n]->address_toWrite=EEPROM.read(addr+offset);
+                addr=partition_length;
+                isFull=false;
+            }
+        }
+        if(isFull){
+            address[var_n]->address_toWrite=offset;
+            EEPROM.write(offset,0b11111111);
         }
     }
 }
 
-uint16_t lengthAllocationPerVar(uint16_t partition_length){
+uint16_t getLengthAllocationPerVar(uint16_t partition_length){
     //partition_length/numOfVar
 }
 
-void update(uint16_t var_n, uint16_t *latestAddress[]){
-    
+void update(uint16_t var_n, MSN_eepromwl *address[], uint8_t val){
+    //eeprom update
+    EEPROM.update(address[var_n]->address_toWrite, val);
+    //header update
+    updateHeaderByte(var_n, &address);
+}
+
+uint8_t read(uint16_t var_n, MSN_eepromwl *address[], uint8_t val){
+    return EEPROM.read(address[var_n]->address_toRead);
+}
+
+void updateHeaderByte(uint16_t var_n, MSN_eepromwl *address[]){
+    address[var_n]->address_toRead=address[var_n]->address_toWrite;
+    bool isFull=true;
+    for(int addr=0; addr<lengthPerVar; addr+=2){
+		if(!EEPROM.read(addr+offset)){}
+		else{
+            address[var_n]->address_toWrite=EEPROM.read(addr+offset);
+            addr=partition_length;
+            isFull=false;
+        }
+    }
+    if(isFull){
+        address[var_n]->address_toWrite=offset;
+        EEPROM.write(offset,0b11111111);
+    }
 }
