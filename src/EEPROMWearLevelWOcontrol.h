@@ -24,9 +24,9 @@
 
 class EEPROMWearLevelWOcontrol: EEPROMClass {
   public:
-    void begin(MSN_EEPROMwlAddr *address[], uint16_t partition_length);
-    uint8_t read(uint16_t var_n, MSN_EEPROMwlAddr *address[], uint8_t val);
-    void update(uint16_t var_n, MSN_EEPROMwlAddr *address[], uint8_t val);
+    void begin(MSN_EEPROMwlAddr* address[], uint16_t partition_length);
+    uint8_t read(uint16_t var_n, MSN_EEPROMwlAddr* address[], uint8_t val);
+    void update(uint16_t var_n, MSN_EEPROMwlAddr* address[], uint8_t val);
     class MSN_EEPROMwlAddr{
       public:
        uint16_t address_toRead;
@@ -37,7 +37,7 @@ class EEPROMWearLevelWOcontrol: EEPROMClass {
   private:
    uint16_t lengthPerVar;
    uint16_t numOfVar;
-   void updateHeaderByte(uint16_t var_n, MSN_EEPROMwlAddr *address[]);
+   void updateHeaderByte(uint16_t var_n, MSN_EEPROMwlAddr* address[]);
    uint16_t getLengthAllocationPerVar(uint16_t partition_length);
 };
 

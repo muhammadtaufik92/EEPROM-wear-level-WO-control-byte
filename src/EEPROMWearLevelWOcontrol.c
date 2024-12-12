@@ -45,7 +45,7 @@ void update(uint16_t var_n, MSN_EEPROMwlAddr *address[], uint8_t val){
     updateHeaderByte(var_n, &address);
 }
 
-uint8_t read(uint16_t var_n, MSN_EEPROMwlAddr *address[], uint8_t val){
+uint8_t read(uint16_t var_n, MSN_EEPROMwlAddr *address[]){
     return EEPROM.read(address[var_n]->address_toRead);
 }
 

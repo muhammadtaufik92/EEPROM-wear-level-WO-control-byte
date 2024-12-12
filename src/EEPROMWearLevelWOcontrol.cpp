@@ -13,7 +13,7 @@ MSN_EEPROMWearLevel::constructor(){
     lengthPerVar=0;
 }
 
-void MSN_EEPROMWearLevel::begin(MSN_EEPROMwlAddr *address[], uint16_t partition_length){
+void MSN_EEPROMWearLevel::begin(MSN_EEPROMwlAddr* address[], uint16_t partition_length){
     numOfVar=(uint16_t)(sizeof(address)/sizeof(address[0]));
     lengthPerVar=getLengthAllocationPerVar(partition_length);
     for(uint8_t var_n=0;var_n<numOfVar;var_n++){
@@ -42,21 +42,21 @@ void MSN_EEPROMWearLevel::begin(MSN_EEPROMwlAddr *address[], uint16_t partition_
 }
 
 uint16_t MSN_EEPROMWearLevel::getLengthAllocationPerVar(uint16_t partition_length){
-    //partition_length/numOfVar
+    lengthPerVar=partition_length/numOfVar;
 }
 
-void MSN_EEPROMWearLevel::update(uint16_t var_n, MSN_EEPROMwlAddr *address[], uint8_t val){
+void MSN_EEPROMWearLevel::update(uint16_t var_n, MSN_EEPROMwlAddr* address[], uint8_t val){
     //eeprom update
     EEPROM.update(address[var_n]->address_toWrite, val);
     //header update
     updateHeaderByte(var_n, &address);
 }
 
-uint8_t MSN_EEPROMWearLevel::read(uint16_t var_n, MSN_EEPROMwlAddr *address[], uint8_t val){
+uint8_t MSN_EEPROMWearLevel::read(uint16_t var_n, MSN_EEPROMwlAddr* address[]){
     return EEPROM.read(address[var_n]->address_toRead);
 }
 
-void MSN_EEPROMWearLevel::updateHeaderByte(uint16_t var_n, MSN_EEPROMwlAddr *address[]){
+void MSN_EEPROMWearLevel::updateHeaderByte(uint16_t var_n, MSN_EEPROMwlAddr* address[]){
     address[var_n]->address_toRead=address[var_n]->address_toWrite;
     bool isFull=true;
     for(int addr=0; addr<lengthPerVar; addr+=2){
