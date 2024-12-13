@@ -12,7 +12,7 @@ class MSN_EEPROMWearLevel{
        uint16_t address_toWrite;
     };
     void begin(MSN_EEPROMwlAddr* address[], uint16_t partition_length);
-    uint8_t read(uint16_t var_n, MSN_EEPROMwlAddr* address[], uint8_t val);
+    uint16_t read(uint16_t var_n, MSN_EEPROMwlAddr* address[]);
     void update(uint16_t var_n, MSN_EEPROMwlAddr* address[], uint8_t val);
   private:
    uint16_t lengthPerVar;

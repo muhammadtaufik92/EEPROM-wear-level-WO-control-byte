@@ -1,36 +1,53 @@
-
-//uint16_t lengthOfPartition;
-
-/*struct eepromwladdr{
-    uint16_t address_toRead;
-    uint16_t address_toWrite;
-} typedef struct eepromwladdr MSN_EEPROMwlAddr;
-*/
 #include "EEPROMWearLevelWOcontrol.h"
+#include <Arduino.h>
 MSN_EEPROMWearLevel EEPROMwl;
+//cek alamat kosong tiap kali read dan write
+//tanpa update update pada pointer
+#define DEBUG
 
 MSN_EEPROMWearLevel::MSN_EEPROMWearLevel(){
     numOfVar=0;
     lengthPerVar=0;
 }
 
+uint16_t MSN_EEPROMWearLevel::read(uint16_t var_n, MSN_EEPROMwlAddr* address[]){
+    return EEPROM.read(address[var_n]->address_toRead);
+}
+
 void MSN_EEPROMWearLevel::begin(MSN_EEPROMwlAddr* address[], uint16_t partition_length){
+    #ifdef DEBUG
+    Serial.println("begin func");
+    #endif
     numOfVar=(uint16_t)(sizeof(address)/sizeof(address[0]));
+    #ifdef DEBUG
+    Serial.println("  sizeof(address): "+String(sizeof(address)));
+    Serial.println("  sizeof(address[0]): "+String(sizeof(MSN_EEPROMWearLevel::MSN_EEPROMwlAddr)));
+    Serial.println("  numOfVar: "+String(numOfVar));
+    #endif
     lengthPerVar=getLengthAllocationPerVar(partition_length);
     for(uint8_t var_n=0;var_n<numOfVar;var_n++){
       uint16_t base_address=lengthPerVar*var_n;
+      #ifdef DEBUG
+      Serial.println("  base address: "+String(base_address));
+      #endif
 		for(int offset=0; offset<lengthPerVar; offset+=2){
 			if(!EEPROM.read(offset+base_address)){}
 			else{
-        address[var_n]->address_toRead=EEPROM.read(offset-1+base_address);
+        address[var_n]->address_toRead=offset-1+base_address;
         offset=lengthPerVar;
+        #ifdef DEBUG
+        Serial.println("    address_toRead: "+String(address[var_n]->address_toRead));
+        #endif
       }
     }
     bool isFull=true;
     for(int offset=0; offset<lengthPerVar; offset+=2){
 		  if(!EEPROM.read(offset+base_address)){}
 		  else{
-        address[var_n]->address_toWrite=EEPROM.read(offset+1+base_address);
+        address[var_n]->address_toWrite=offset+1+base_address;
+        #ifdef DEBUG
+        Serial.println("    address_toWrite: "+String(address[var_n]->address_toWrite));
+        #endif
         offset=lengthPerVar;
         isFull=false;
       }
@@ -44,32 +61,41 @@ void MSN_EEPROMWearLevel::begin(MSN_EEPROMwlAddr* address[], uint16_t partition_
 
 uint16_t MSN_EEPROMWearLevel::getLengthAllocationPerVar(uint16_t partition_length){
   lengthPerVar=partition_length/numOfVar;
+  #ifdef DEBUG
+  Serial.println("  lengthPerVar: "+String(lengthPerVar));
+  #endif
 }
 
 void MSN_EEPROMWearLevel::updateHeaderByte(uint16_t var_n, MSN_EEPROMwlAddr* address[]){
-    address[var_n]->address_toRead=address[var_n]->address_toWrite;
-    bool isFull=true;
-    for(int offset=0; offset<lengthPerVar; offset+=2){
-		if(!EEPROM.read(offset+base_address)){}
-		else{
-            address[var_n]->address_toWrite=EEPROM.read(offset+base_address);
-            offset=partition_length;
-            isFull=false;
-        }
-    }
-    if(isFull){
-        address[var_n]->address_toWrite=base_address;
-        EEPROM.write(base_address,0b11111111);
-    }
+  #ifdef DEBUG
+  Serial.println("update header func");
+  #endif
+  address[var_n]->address_toRead=address[var_n]->address_toWrite;
+  uint16_t base_address=lengthPerVar*var_n;
+  #ifdef DEBUG
+  Serial.println("  base address: "+String(base_address));
+  #endif
+  if((address[var_n]->address_toRead-base_address)<(lengthPerVar-1)){
+    address[var_n]->address_toWrite=address[var_n]->address_toRead+2;
+    #ifdef DEBUG
+    Serial.println("    address_toRead: "+String(address[var_n]->address_toRead));
+    #endif
+  }
+  else{
+    address[var_n]->address_toWrite=base_address+1;
+    #ifdef DEBUG
+    Serial.println("    address_toWrite: "+String(address[var_n]->address_toWrite));
+    #endif
+    EEPROM.write(base_address,0b11111111);
+  }
 }
 
 void MSN_EEPROMWearLevel::update(uint16_t var_n, MSN_EEPROMwlAddr* address[], uint8_t val){
     //eeprom update
-    EEPROM.update((address[var_n]->address_toWrite)+1, val);
+    #ifdef DEBUG
+    Serial.println("update func");
+    #endif
+    EEPROM.update(address[var_n]->address_toWrite, val);
     //header update
-    updateHeaderByte(var_n, &address);
-}
-
-uint8_t MSN_EEPROMWearLevel::read(uint16_t var_n, MSN_EEPROMwlAddr* address[]){
-    return EEPROM.read(address[var_n]->address_toRead);
+    updateHeaderByte(var_n, address);
 }
