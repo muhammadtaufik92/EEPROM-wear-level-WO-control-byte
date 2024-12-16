@@ -13,6 +13,12 @@ MSN_EEPROMWearLevel::MSN_EEPROMwlAddr* address[]={&var_a,&var_b,&var_c,NULL};
 #define IDX_VAR_NTH    (uint16_t[]){IDX_VAR_A, IDX_VAR_B, IDX_VAR_C}
 
 void setup() {
+  TCCR0B = TCCR0B & B11111000 | B00000001;//64x faster than default
+  TCCR1B = TCCR1B & B11111000 | B00000001;
+  TCCR2B = TCCR2B & B11111000 | B00000001;
+  TCCR3B = TCCR3B & B11111000 | B00000001;
+  TCCR4B = TCCR4B & B11111000 | B00000001;
+  TCCR5B = TCCR5B & B11111000 | B00000001;
   Serial.begin(115200);
   delay(500);
   EEPROMwl.begin(address, PARTITION_LENGTH);

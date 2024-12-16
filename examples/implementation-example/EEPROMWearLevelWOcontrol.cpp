@@ -40,20 +40,22 @@ void MSN_EEPROMWearLevel::begin(MSN_EEPROMwlAddr* address[], uint16_t partition_
       Serial.println("    base address: "+String(base_address));
       #endif
 		for(int offset=0; offset<lengthPerVar; offset+=2){
-			if(!EEPROM.read(offset+base_address)){}
+			if(EEPROM.read(offset+base_address)){}
 			else{
-        if(offset==0){
-          address[var_n]->address_toRead=base_address+lengthPerVar-1;  
-        }
-        else
-        address[var_n]->address_toRead=base_address+offset-1;
+        address[var_n]->address_toRead=base_address+offset+1;
+        address[var_n]->address_toWrite=base_address+offset+1+2;
         offset=lengthPerVar;
         #ifdef DEBUG
         Serial.println("    address_toRead: "+String(address[var_n]->address_toRead));
+        Serial.println("    address_toRead: "+String(address[var_n]->address_toWrite));
         #endif
       }
+      if(offset==lengthPerVar-2){
+        address[var_n]->address_toRead=base_address+offset+1;
+        address[var_n]->address_toWrite=base_address+offset+1+2;
+      }
     }
-    bool isFull=true;
+    /*bool isFull=true;
     for(int offset=0; offset<lengthPerVar; offset+=2){
 		  if(!EEPROM.read(offset+base_address)){}
 		  else{
@@ -68,7 +70,7 @@ void MSN_EEPROMWearLevel::begin(MSN_EEPROMwlAddr* address[], uint16_t partition_
     if(isFull){
         address[var_n]->address_toWrite=base_address+1;
         EEPROM.write(base_address,0b11111111);
-    }
+    }*/
   }
 }
 
@@ -86,9 +88,15 @@ void MSN_EEPROMWearLevel::updateHeaderByte(uint16_t var_n, MSN_EEPROMwlAddr* add
   #ifdef DEBUG
   Serial.println("update header func");
   #endif
+  uint16_t base_address=lengthPerVar*var_n;
   EEPROM.write(address[var_n]->address_toWrite-1, 0);
   address[var_n]->address_toRead=address[var_n]->address_toWrite;
-  uint16_t base_address=lengthPerVar*var_n;
+  if((uint8_t)(address[var_n]->address_toRead)-2==254){
+    EEPROM.write(lengthPerVar-1, 255);
+  }
+  else{
+    EEPROM.write(address[var_n]->address_toRead-2, 255);
+  }
   #ifdef DEBUG
   Serial.println("  base address: "+String(base_address));
   #endif
@@ -103,7 +111,7 @@ void MSN_EEPROMWearLevel::updateHeaderByte(uint16_t var_n, MSN_EEPROMwlAddr* add
     #ifdef DEBUG
     Serial.println("    address_toWrite: "+String(address[var_n]->address_toWrite));
     #endif
-    EEPROM.write(base_address,0b11111111);
+    //EEPROM.write(base_address,0b11111111);
   }
 }
 
