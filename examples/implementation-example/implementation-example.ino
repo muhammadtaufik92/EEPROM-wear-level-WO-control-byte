@@ -1,7 +1,7 @@
 #include "EEPROMWearLevelWOcontrol.h"
 
 #define NUM_OF_VAR          3
-#define PARTITION_LENGTH    1024
+#define PARTITION_LENGTH    20
 
 
 MSN_EEPROMWearLevel::MSN_EEPROMwlAddr var_a,var_b,var_c;
@@ -18,7 +18,10 @@ void setup() {
   EEPROMwl.begin(address, PARTITION_LENGTH);
   for(uint8_t i=0;i<NUM_OF_VAR;i++){
     Serial.print("VAR "+String(i)+": ");
-    Serial.println(EEPROMwl.read(IDX_VAR_NTH[i],address));
+    Serial.println(EEPROMwl.read(IDX_VAR_NTH[i]-0x41,address));
+  }
+  for(uint8_t i=0;i<18;i++){
+    Serial.println("EEPROM Address "+String(i)+": "+String(EEPROM.read(i)));
   }
   Serial.println("Enter values for the next startup sequence");
   Serial.println("the values printed in the next startup sequence will be the value stored in this session");
@@ -34,18 +37,19 @@ void cmd(){
     uint8_t cmd_available = 0;
     if(str[0]==0x21){
       if (str[1]==IDX_VAR_A) {
-        EEPROMwl.update(IDX_VAR_A, address, (uint8_t)str[3]);
-        Serial.println("VAR "+String(IDX_VAR_A)+" is successfully updated to "+String(EEPROMwl.read(IDX_VAR_A, address)));
+        EEPROMwl.update(IDX_VAR_A, address, (uint8_t)str[2]);
+        Serial.println((uint8_t)str[2]);
+        Serial.println("VAR "+String(IDX_VAR_A-0x41)+" is successfully updated to "+String(EEPROMwl.read(IDX_VAR_A-0x41, address)));
         cmd_available=1;
       }
       if (str[1]==IDX_VAR_B) {
-        EEPROMwl.update(IDX_VAR_B, address, (uint8_t)str[3]);
-        Serial.println("VAR "+String(IDX_VAR_B)+" is successfully updated to "+String(EEPROMwl.read(IDX_VAR_B, address)));
+        EEPROMwl.update(IDX_VAR_B, address, (uint8_t)str[2]);
+        Serial.println("VAR "+String(IDX_VAR_B-0x41)+" is successfully updated to "+String(EEPROMwl.read(IDX_VAR_B-0x41, address)));
         cmd_available=1;
       }
       if (str[1]==IDX_VAR_C) {
-        EEPROMwl.update(IDX_VAR_C, address, (uint8_t)str[3]);
-        Serial.println("VAR "+String(IDX_VAR_C)+" is successfully updated to "+String(EEPROMwl.read(IDX_VAR_C, address)));
+        EEPROMwl.update(IDX_VAR_C, address, (uint8_t)str[2]);
+        Serial.println("VAR "+String(IDX_VAR_C-0x41)+" is successfully updated to "+String(EEPROMwl.read(IDX_VAR_C-0x41, address)));
         cmd_available=1;
       }
       if (!cmd_available) {
