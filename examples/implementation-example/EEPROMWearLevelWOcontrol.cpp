@@ -4,6 +4,7 @@ MSN_EEPROMWearLevel EEPROMwl;
 //cek alamat kosong tiap kali read dan write
 //tanpa update update pada pointer
 #define DEBUG
+#define ELEMENT_MAX 10
 
 MSN_EEPROMWearLevel::MSN_EEPROMWearLevel(){
     numOfVar=0;
@@ -18,22 +19,34 @@ void MSN_EEPROMWearLevel::begin(MSN_EEPROMwlAddr* address[], uint16_t partition_
     #ifdef DEBUG
     Serial.println("begin func");
     #endif
-    numOfVar=(uint16_t)(sizeof(address)/sizeof(address[0]));
+    for(uint8_t i=0;i<ELEMENT_MAX;i++){
+      if(address[i]==NULL){
+        numOfVar=i;
+        i=ELEMENT_MAX;
+      }
+    }
+    //numOfVar=(uint16_t)(sizeof(address)/sizeof(MSN_EEPROMWearLevel::MSN_EEPROMwlAddr));
     #ifdef DEBUG
-    Serial.println("  sizeof(address): "+String(sizeof(address)));
-    Serial.println("  sizeof(address[0]): "+String(sizeof(MSN_EEPROMWearLevel::MSN_EEPROMwlAddr)));
+    //Serial.println("  sizeof(address): "+String(sizeof(address)));
+    //Serial.println("  sizeof(address[0]): "+String(sizeof(MSN_EEPROMWearLevel::MSN_EEPROMwlAddr)));
     Serial.println("  numOfVar: "+String(numOfVar));
     #endif
     lengthPerVar=getLengthAllocationPerVar(partition_length);
     for(uint8_t var_n=0;var_n<numOfVar;var_n++){
       uint16_t base_address=lengthPerVar*var_n;
       #ifdef DEBUG
-      Serial.println("  base address: "+String(base_address));
+      Serial.println("  var_n: "+String(var_n));
+      Serial.println("    base address: "+String(base_address));
+      Serial.println("    lengthPerVar: "+String(lengthPerVar));
       #endif
 		for(int offset=0; offset<lengthPerVar; offset+=2){
 			if(!EEPROM.read(offset+base_address)){}
 			else{
-        address[var_n]->address_toRead=offset-1+base_address;
+        if(offset==0){
+          address[var_n]->address_toRead=base_address+lengthPerVar-1;  
+        }
+        else
+        address[var_n]->address_toRead=base_address+offset-1;
         offset=lengthPerVar;
         #ifdef DEBUG
         Serial.println("    address_toRead: "+String(address[var_n]->address_toRead));
@@ -61,9 +74,12 @@ void MSN_EEPROMWearLevel::begin(MSN_EEPROMwlAddr* address[], uint16_t partition_
 
 uint16_t MSN_EEPROMWearLevel::getLengthAllocationPerVar(uint16_t partition_length){
   lengthPerVar=partition_length/numOfVar;
+  lengthPerVar/=2;
+  lengthPerVar*=2;
   #ifdef DEBUG
   Serial.println("  lengthPerVar: "+String(lengthPerVar));
   #endif
+  return lengthPerVar;
 }
 
 void MSN_EEPROMWearLevel::updateHeaderByte(uint16_t var_n, MSN_EEPROMwlAddr* address[]){

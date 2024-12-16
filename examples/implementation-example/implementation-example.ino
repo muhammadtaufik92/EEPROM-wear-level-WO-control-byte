@@ -1,11 +1,11 @@
 #include "EEPROMWearLevelWOcontrol.h"
 
-#define NUM_OF_VAR          4
+#define NUM_OF_VAR          3
 #define PARTITION_LENGTH    1024
 
 
 MSN_EEPROMWearLevel::MSN_EEPROMwlAddr var_a,var_b,var_c;
-MSN_EEPROMWearLevel::MSN_EEPROMwlAddr* address[NUM_OF_VAR]={&var_a,&var_b,&var_c};
+MSN_EEPROMWearLevel::MSN_EEPROMwlAddr* address[]={&var_a,&var_b,&var_c,NULL};
 #define IDX_VAR_A   0x41
 #define IDX_VAR_B   0x42
 #define IDX_VAR_C   0x43
