@@ -23,12 +23,17 @@ void setup() {
   delay(500);
   EEPROMwl.begin(address, PARTITION_LENGTH);
   for(uint8_t i=0;i<NUM_OF_VAR;i++){
-    Serial.print("VAR "+String(i)+": ");
-    Serial.println(EEPROMwl.read(IDX_VAR_NTH[i]-0x41,address));
+    if(address[i]->address_toRead!=NULL){
+      Serial.print("VAR "+String(i)+": ");
+      Serial.println(EEPROMwl.read(IDX_VAR_NTH[i]-0x41,address));
+    }
+    else{
+      Serial.println("VAR "+String(i)+": NULL");
+    }
   }
-  for(uint8_t i=0;i<18;i++){
+  /*for(uint8_t i=0;i<18;i++){
     Serial.println("EEPROM Address "+String(i)+": "+String(EEPROM.read(i)));
-  }
+  }*/
   Serial.println("Enter values for the next startup sequence");
   Serial.println("the values printed in the next startup sequence will be the value stored in this session");
 }

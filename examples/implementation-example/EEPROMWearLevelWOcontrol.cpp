@@ -13,7 +13,12 @@ MSN_EEPROMWearLevel::MSN_EEPROMWearLevel(){
 }
 
 uint16_t MSN_EEPROMWearLevel::read(uint16_t var_n, MSN_EEPROMwlAddr* address[]){
-    return EEPROM.read(address[var_n]->address_toRead);
+    if(address[var_n]->address_toRead!=NULL){
+      return EEPROM.read(address[var_n]->address_toRead);
+    }
+    else{
+      return NULL;
+    }
 }
 
 void MSN_EEPROMWearLevel::begin(MSN_EEPROMwlAddr* address[], uint16_t partition_length){
@@ -39,20 +44,25 @@ void MSN_EEPROMWearLevel::begin(MSN_EEPROMwlAddr* address[], uint16_t partition_
       Serial.println("  var_n: "+String(var_n));
       Serial.println("    base address: "+String(base_address));
       #endif
-		for(int offset=0; offset<lengthPerVar; offset+=2){
-			if(EEPROM.read(offset+base_address)){}
+		for(uint16_t offset=0; offset<lengthPerVar; offset+=2){
+			//Serial.println("    offset: "+String(offset));
+      if(EEPROM.read(offset+base_address)){}
 			else{
         address[var_n]->address_toRead=base_address+offset+1;
         address[var_n]->address_toWrite=base_address+offset+1+2;
         offset=lengthPerVar;
         #ifdef DEBUG
         Serial.println("    address_toRead: "+String(address[var_n]->address_toRead));
-        Serial.println("    address_toRead: "+String(address[var_n]->address_toWrite));
+        Serial.println("    address_toWrite: "+String(address[var_n]->address_toWrite));
         #endif
       }
-      if(offset==lengthPerVar-2){
-        address[var_n]->address_toRead=base_address+offset+1;
-        address[var_n]->address_toWrite=base_address+offset+1+2;
+      if(lengthPerVar-offset==2){
+        address[var_n]->address_toRead=NULL;
+        address[var_n]->address_toWrite=base_address+1;
+        #ifdef DEBUG
+        Serial.println("    address_toRead: NULL");
+        Serial.println("    address_toWrite: "+String(address[var_n]->address_toWrite));
+        #endif
       }
     }
     /*bool isFull=true;
