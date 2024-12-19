@@ -31,9 +31,9 @@ void setup() {
       Serial.println("VAR "+String(i)+": NULL");
     }
   }
-  /*for(uint8_t i=0;i<18;i++){
+  for(uint8_t i=0;i<18;i++){
     Serial.println("EEPROM Address "+String(i)+": "+String(EEPROM.read(i)));
-  }*/
+  }
   Serial.println("Enter values for the next startup sequence");
   Serial.println("the values printed in the next startup sequence will be the value stored in this session");
 }
