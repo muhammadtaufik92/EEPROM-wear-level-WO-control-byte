@@ -4,7 +4,7 @@ MSN_EEPROMWearLevel EEPROMwl;
 //cek alamat kosong tiap kali read dan write
 //tanpa update update pada pointer
 #define DEBUG
-#define ELEMENT_MAX 10
+//#define ELEMENT_MAX 10
 #define VAR_N_FROM_0x41
 
 MSN_EEPROMWearLevel::MSN_EEPROMWearLevel(){
@@ -25,12 +25,17 @@ void MSN_EEPROMWearLevel::begin(MSN_EEPROMwlAddr* address[], uint16_t partition_
     #ifdef DEBUG
     Serial.println("begin func");
     #endif
-    for(uint8_t i=0;i<ELEMENT_MAX;i++){
+    uint8_t i=0;
+    while(address[i]!=NULL){
+      i++;
+    }
+    numOfVar=i;
+    /*for(uint8_t i=0;i<ELEMENT_MAX;i++){
       if(address[i]==NULL){
         numOfVar=i;
         i=ELEMENT_MAX;
       }
-    }
+    }*/
     //numOfVar=(uint16_t)(sizeof(address)/sizeof(MSN_EEPROMWearLevel::MSN_EEPROMwlAddr));
     #ifdef DEBUG
     //Serial.println("  sizeof(address): "+String(sizeof(address)));

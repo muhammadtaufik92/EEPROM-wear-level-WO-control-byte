@@ -1,0 +1,23 @@
+#######################################
+# Syntax Coloring Map For EEPROM-wear-level-WO-control-byte
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+MSN_EEPROMWearLevel	KEYWORD1
+MSN_EEPROMwlAddr	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+begin	KEYWORD2
+read	KEYWORD2
+update	KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
