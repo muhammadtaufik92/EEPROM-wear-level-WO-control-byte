@@ -1,7 +1,7 @@
 #include "EEPROMWearLevelWOcontrol.h"
 
 #define NUM_OF_VAR          3
-#define PARTITION_LENGTH    20
+#define PARTITION_LENGTH    30
 
 
 MSN_EEPROMWearLevel::MSN_EEPROMwlAddr var_a,var_b,var_c;
@@ -31,9 +31,7 @@ void setup() {
       Serial.println("VAR "+String(i)+": NULL");
     }
   }
-  for(uint8_t i=0;i<18;i++){
-    Serial.println("EEPROM Address "+String(i)+": "+String(EEPROM.read(i)));
-  }
+  EEPROM_print();
   Serial.println("Enter values for the next startup sequence");
   Serial.println("the values printed in the next startup sequence will be the value stored in this session");
 }
@@ -63,7 +61,10 @@ void cmd(){
         Serial.println("VAR "+String(IDX_VAR_C-0x41)+" is successfully updated to "+String(EEPROMwl.read(IDX_VAR_C-0x41, address)));
         cmd_available=1;
       }
-      if (!cmd_available) {
+      if(cmd_available){
+        EEPROM_print();
+      }
+      else{
         Serial.println("Var not found");
       }
     }
@@ -75,6 +76,16 @@ void cmd(){
     }
     else{
       Serial.println("command should start with 0x21 (!), then 1 byte of var index, then 1 byte of value");
+    }
+  }
+}
+
+void EEPROM_print(){
+  Serial.println("\nEEPROM CONTENT:");
+  for(uint8_t i=0;i<30;i++){
+    Serial.println("  Address "+String(i)+": "+String(EEPROM.read(i)));
+    if((i+1)%10==0){
+      Serial.println();
     }
   }
 }
