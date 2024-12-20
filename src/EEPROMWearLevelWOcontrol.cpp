@@ -5,7 +5,7 @@ MSN_EEPROMWearLevel EEPROMwl;
 //tanpa update update pada pointer
 #define DEBUG
 //#define ELEMENT_MAX 10
-#define VAR_N_FROM_0x41
+//#define VAR_N_FROM_0x41
 
 MSN_EEPROMWearLevel::MSN_EEPROMWearLevel(){
     numOfVar=0;
@@ -119,7 +119,7 @@ void MSN_EEPROMWearLevel::updateHeaderByte(uint16_t var_n, MSN_EEPROMwlAddr* add
     EEPROM.write(address[var_n]->address_toRead-3, 255);
   }
   #ifdef DEBUG
-  Serial.println("  base address: "+String(base_address));
+  Serial.println("  base address: "+String(base_address)+" = "+String(lengthPerVar)+"*"+String(var_n));
   #endif
   if((address[var_n]->address_toRead-base_address)<(lengthPerVar-2)){
     address[var_n]->address_toWrite=address[var_n]->address_toRead+2;
