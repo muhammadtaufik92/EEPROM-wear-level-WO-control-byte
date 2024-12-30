@@ -3,7 +3,7 @@
 MSN_EEPROMWearLevel EEPROMwl;
 //cek alamat kosong tiap kali read dan write
 //tanpa update update pada pointer
-#define DEBUG
+//#define DEBUG
 //#define ELEMENT_MAX 10
 //#define VAR_N_FROM_0x41
 
