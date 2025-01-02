@@ -42,24 +42,29 @@ void MSN_EEPROMWearLevel::begin(MSN_EEPROMwlAddr* address[], uint16_t partition_
     //Serial.println("  sizeof(address[0]): "+String(sizeof(MSN_EEPROMWearLevel::MSN_EEPROMwlAddr)));
     Serial.println("  numOfVar: "+String(numOfVar));
     #endif
-    lengthPerVar=getLengthAllocationPerVar(partition_length);
+    //lengthPerVar=getLengthAllocationPerVar(partition_length);//tidak dapat mengakomodasi versi baru (panjang data > 1 byte)
     for(uint8_t var_n=0;var_n<numOfVar;var_n++){
-      uint16_t base_address=lengthPerVar*var_n;
+      //uint16_t base_address/*=lengthPerVar*var_n*/;
+      if(var_n==0){
+        address[var_n]->address_base=0;
+      }else{
+        address[var_n]->address_base=address[var_n-1]->address_base+address[var_n-1]->lengthAllocation;
+      }
       #ifdef DEBUG
       Serial.println("  var_n: "+String(var_n));
       Serial.println("    base address: "+String(base_address));
       #endif
 		for(uint16_t offset=0; offset<lengthPerVar; offset+=2){
 			//Serial.println("    offset: "+String(offset));
-      if(EEPROM.read(offset+base_address)){}
+      if(EEPROM.read(offset+address[var_n]->address_base)){}
 			else{
         if((offset+1)<(lengthPerVar-2)){
-          address[var_n]->address_toRead=base_address+offset+1;
-          address[var_n]->address_toWrite=base_address+offset+1+2;
+          address[var_n]->address_toRead=address[var_n]->address_base+offset+1;
+          address[var_n]->address_toWrite=address[var_n]->address_base+offset+1+2;
         }
         else{
-          address[var_n]->address_toRead=base_address+offset+1;
-          address[var_n]->address_toWrite=base_address+1;
+          address[var_n]->address_toRead=address[var_n]->address_base+offset+1;
+          address[var_n]->address_toWrite=address[var_n]->address_base+1;
         }
         offset=lengthPerVar;
         #ifdef DEBUG

@@ -8,6 +8,9 @@ class MSN_EEPROMWearLevel{
   MSN_EEPROMWearLevel();
     class MSN_EEPROMwlAddr{
       public:
+       uint16_t size = 1;
+       uint16_t lengthAllocation;
+       uint16_t address_base;
        uint16_t address_toRead;
        uint16_t address_toWrite;
     };
