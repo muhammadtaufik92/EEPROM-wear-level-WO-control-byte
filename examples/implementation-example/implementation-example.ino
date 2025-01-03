@@ -6,6 +6,7 @@
 
 MSN_EEPROMWearLevel::MSN_EEPROMwlAddr var_a,var_b,var_c;
 MSN_EEPROMWearLevel::MSN_EEPROMwlAddr* address[]={&var_a,&var_b,&var_c,NULL};
+
 #define IDX_VAR_A   0x41
 #define IDX_VAR_B   0x42
 #define IDX_VAR_C   0x43
@@ -13,6 +14,7 @@ MSN_EEPROMWearLevel::MSN_EEPROMwlAddr* address[]={&var_a,&var_b,&var_c,NULL};
 #define IDX_VAR_NTH    (uint16_t[]){IDX_VAR_A, IDX_VAR_B, IDX_VAR_C}
 
 void setup() {
+  var_a.size=WORD;
   TCCR0B = TCCR0B & B11111000 | B00000001;//64x faster than default
   TCCR1B = TCCR1B & B11111000 | B00000001;
   TCCR2B = TCCR2B & B11111000 | B00000001;
