@@ -14,9 +14,31 @@ MSN_EEPROMWearLevel::MSN_EEPROMWearLevel(){
     size_total=0;
 }
 
-uint16_t MSN_EEPROMWearLevel::read(uint16_t var_n, MSN_EEPROMwlAddr* address[]){
+uint32_t MSN_EEPROMWearLevel::read(uint16_t var_n, MSN_EEPROMwlAddr* address[]){
     if(address[var_n]->address_toRead!=NULL){
-      return EEPROM.read(address[var_n]->address_toRead);
+      uint8_t data_size=address[var_n]->size;
+      switch(data_size){
+        case BYTE:{
+          return EEPROM.read(address[var_n]->address_toRead);
+          break;
+        }
+        case WORD:{
+          uint16_t val=0;
+          val+=(uint16_t)EEPROM.read(address[var_n]->address_toRead)<<8;
+          val+=(uint16_t)EEPROM.read(address[var_n]->address_toRead+1) ;
+          return val;
+          break;
+        }
+        case DWORD:{
+          uint32_t val=0;
+          val+=(uint32_t)EEPROM.read(address[var_n]->address_toRead  ) <<24;
+          val+=(uint32_t)EEPROM.read(address[var_n]->address_toRead+1) <<16; 
+          val+=(uint32_t)EEPROM.read(address[var_n]->address_toRead+2) <<8 ; 
+          val+=(uint32_t)EEPROM.read(address[var_n]->address_toRead+3)     ;
+          return val;
+          break;
+        }
+      }
     }
     else{
       return NULL;
