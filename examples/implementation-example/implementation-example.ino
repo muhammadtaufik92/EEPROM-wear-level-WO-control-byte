@@ -87,10 +87,13 @@ void cmd(){
     uint8_t cmd_available = 0;
     if(str[0]==0x21){
       uint8_t chara=str[1];
+      uint16_t val_16=(uint16_t)(str[2]<<8);
+      val_16+=(uint16_t)str[3];
       switch (chara){
         case IDX_VAR_A: {
-          EEPROMwl.update(IDX_VAR_A, address, (uint8_t)str[2]);
-          Serial.println((uint8_t)str[2]);
+          EEPROMwl.update(IDX_VAR_A, address, val_16);
+          Serial.print((uint8_t)str[2]);
+          Serial.println((uint8_t)str[3]);
           Serial.println("VAR "+String(IDX_VAR_A-0x41)+" is successfully updated to "+String(EEPROMwl.read(IDX_VAR_A-0x41, address)));
           cmd_available=1;
           break;
